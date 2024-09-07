@@ -1,4 +1,22 @@
+name: ImageTo3DConverter
+description: A new Flutter project
+
+# The following defines the version and build number for your application.
+version: 1.0.0+1
+
+environment:
+  sdk: '^3.5.0'
+
 dependencies:
   flutter:
     sdk: flutter
-  http: ^0.13.4 
+
+  # Other dependencies
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
