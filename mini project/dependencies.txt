@@ -1,17 +1,20 @@
-name: ImageTo3DConverter
-description: A new Flutter project
+name: image_to_3d_converter
+description: A Flutter app to convert images to 3D models using an API.
 
-# The following defines the version and build number for your application.
+# Version of the app
 version: 1.0.0+1
 
 environment:
-  sdk: '^3.5.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # Other dependencies
+  # HTTP package to handle API requests
+  http: ^0.13.5
+
+  # Flutter's standard library for handling assets, etc.
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
@@ -20,3 +23,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Adding assets or images for the app
+  assets:
+    - assets/
