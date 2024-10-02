@@ -1,7 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'meshy_api.dart'; // Import the MeshyAPI class we defined earlier
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -9,135 +17,149 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Image to 3D Converter',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: ImageTo3DConverter(),
+      title: 'Image to 3D Model',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: ImageTo3DModelScreen(),
     );
   }
 }
 
-class ImageTo3DConverter extends StatefulWidget {
+class ImageTo3DModelScreen extends StatefulWidget {
   @override
-  _ImageTo3DConverterState createState() => _ImageTo3DConverterState();
+  _ImageTo3DModelScreenState createState() => _ImageTo3DModelScreenState();
 }
 
-class _ImageTo3DConverterState extends State<ImageTo3DConverter> {
-  final TextEditingController _imageUrlController = TextEditingController();
-  final MeshyAPI meshyAPI = MeshyAPI();
-  String? _taskId;
-  String? _statusMessage = 'Enter an image URL and press "Convert to 3D"';
+class _ImageTo3DModelScreenState extends State<ImageTo3DModelScreen> {
+  File? _image;
+  String? _modelUrl;
   bool _isLoading = false;
-  String? _downloadUrl;
+  final picker = ImagePicker();
 
-  // Start the task to generate 3D model
-  Future<void> _create3DModel() async {
+  Future pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
     setState(() {
-      _isLoading = true;
-      _statusMessage = "Creating task...";
-    });
-
-    final imageUrl = _imageUrlController.text.trim();
-    if (imageUrl.isNotEmpty) {
-      final taskId = await meshyAPI.createImageTo3DTask(imageUrl);
-
-      if (taskId != null) {
-        setState(() {
-          _taskId = taskId;
-          _statusMessage = 'Task created. Checking progress...';
-        });
-        _checkTaskStatus(taskId);
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
       } else {
-        setState(() {
-          _statusMessage = 'Failed to create task.';
-        });
+        print('No image selected.');
       }
-    } else {
-      setState(() {
-        _statusMessage = 'Please enter a valid image URL.';
-      });
-    }
-
-    setState(() {
-      _isLoading = false;
     });
   }
 
-  // Periodically check task status
-  Future<void> _checkTaskStatus(String taskId) async {
+  Future<String> uploadImageToFirebase(File imageFile) async {
+    String fileName = basename(imageFile.path);
+    Reference storageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
+    UploadTask uploadTask = storageRef.putFile(imageFile);
+    TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+    String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+  Future<void> generate3DModel(String imageUrl) async {
     setState(() {
       _isLoading = true;
     });
 
-    bool taskCompleted = false;
-    while (!taskCompleted) {
-      await Future.delayed(Duration(seconds: 5)); // Wait for 5 seconds between each status check
+    const String apiUrl = 'https://api.meshy.ai/v1/image-to-3d';
+    const String apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
 
-      final taskStatus = await meshyAPI.getImageTo3DTaskStatus(taskId);
-      if (taskStatus != null) {
-        setState(() {
-          _statusMessage = 'Task Status: ${taskStatus['status']}';
-        });
+    Map<String, dynamic> body = {
+      "image_url": imageUrl,
+      "enable_pbr": true,
+      "ai_model": "meshy-4",
+    };
 
-        if (taskStatus['status'] == 'SUCCEEDED') {
-          setState(() {
-            _downloadUrl = taskStatus['model_urls']['glb']; // Get GLB URL for download
-            _statusMessage = 'Task completed! Click the link below to download the model.';
-          });
-          taskCompleted = true;
-        } else if (taskStatus['status'] == 'FAILED') {
-          setState(() {
-            _statusMessage = 'Task failed. Error: ${taskStatus['task_error']['message']}';
-          });
-          taskCompleted = true;
-        }
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final taskId = responseData['result'];
+
+        // Now you can poll the task status to get the model URL
+        await getModelUrl(taskId);
+      } else {
+        print('Failed to generate model: ${response.body}');
       }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
 
-    setState(() {
-      _isLoading = false;
-    });
+  Future<void> getModelUrl(String taskId) async {
+    const String apiUrl = 'https://api.meshy.ai/v1/image-to-3d/';
+    const String apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+
+    try {
+      final response = await http.get(
+        Uri.parse('$apiUrl$taskId'),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          _modelUrl = responseData['model_urls']['glb'];
+        });
+      } else {
+        print('Failed to retrieve model URL: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image to 3D Converter'),
+        title: Text('Image to 3D Model'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: _imageUrlController,
-              decoration: InputDecoration(
-                labelText: 'Enter Image URL',
-                border: OutlineInputBorder(),
-              ),
-            ),
+            _image == null
+                ? Text('No image selected.')
+                : Image.file(_image!, height: 150, width: 150),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _create3DModel,
-              child: Text(_isLoading ? 'Processing...' : 'Convert to 3D'),
-            ),
-            SizedBox(height: 20),
-            Text(_statusMessage ?? ''),
-            SizedBox(height: 20),
-            if (_downloadUrl != null)
-              Column(
-                children: [
-                  Text('Model ready!'),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle model download
+            _isLoading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: () async {
+                      if (_image != null) {
+                        String imageUrl = await uploadImageToFirebase(_image!);
+                        await generate3DModel(imageUrl);
+                      }
                     },
-                    child: Text('Download 3D Model'),
+                    child: Text('Generate 3D Model'),
                   ),
-                ],
-              ),
+            SizedBox(height: 20),
+            _modelUrl != null
+                ? Text('Model URL: $_modelUrl')
+                : Text('No model generated yet.'),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: pickImage,
+        child: Icon(Icons.add_a_photo),
       ),
     );
   }
