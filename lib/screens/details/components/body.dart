@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:furniture_app/constants.dart';
 import 'package:furniture_app/models/product.dart';
+import 'package:furniture_app/screens/view_in_3d_screen.dart';
 
-import 'chat_and_add_to_cart.dart';
-import 'list_of_colors.dart';
+
+import 'view_in_3d_button.dart'; 
 import 'product_image.dart';
 
 class Body extends StatelessWidget {
@@ -13,9 +14,7 @@ class Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // it provides total height and width
     Size size = MediaQuery.of(context).size;
-    // it enables scrolling on small devices
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -44,17 +43,18 @@ class Body extends StatelessWidget {
                       ),
                     ),
                   ),
-                  ListOfColors(),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: kDefaultPadding / 2),
                     child: Text(
                       product.title,
                       style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                   Text(
-                    '\$${product.price}',
+                    'Rs.${product.price}/-',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -62,20 +62,33 @@ class Body extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+                    padding:
+                        EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
                     child: Text(
                       product.description,
                       style: TextStyle(color: kTextLightColor),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 5,
                     ),
                   ),
                   SizedBox(height: kDefaultPadding),
                 ],
               ),
             ),
-            ChatAndAddToCart(),
+            ViewIn3DButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewIn3DScreen(), 
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
 }
+

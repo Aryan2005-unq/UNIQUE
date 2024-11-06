@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';  // Ensure the import for flutter_svg is correct
+import 'package:flutter_svg/flutter_svg.dart'; 
 import 'package:furniture_app/constants.dart';
 import 'package:furniture_app/models/product.dart';
 
 import 'components/body.dart';
 
 class DetailsScreen extends StatelessWidget {
-  final Product product;  // Keep product non-nullable
+  final Product product; 
 
   const DetailsScreen({
     Key? key,
-    required this.product,  // Mark product as required
+    required this.product, 
   }) : super(key: key);
 
   @override
@@ -19,7 +19,7 @@ class DetailsScreen extends StatelessWidget {
       backgroundColor: kPrimaryColor,
       appBar: buildAppBar(context),
       body: Body(
-        product: product,  // Pass the non-nullable product
+        product: product,  
       ),
     );
   }

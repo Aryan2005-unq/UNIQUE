@@ -13,7 +13,7 @@ class ProductCard extends StatelessWidget {
 
   final int itemIndex;
   final Product product;
-  final VoidCallback press;  // Change Function to VoidCallback
+  final VoidCallback press; // Change Function to VoidCallback
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class ProductCard extends StatelessWidget {
       ),
       height: 160,
       child: InkWell(
-        onTap: press,  // This should work now
+        onTap: press, // This should work now
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: <Widget>[
@@ -99,7 +99,7 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        "\$${product.price}",
+                        "Rs.${product.price}",
                         style: Theme.of(context).textTheme.labelLarge,
                       ),
                     ),

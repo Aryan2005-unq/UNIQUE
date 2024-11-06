@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
 
-// We need statefull widget because we are gonna change some state on our category
 class CategoryList extends StatefulWidget {
   @override
   _CategoryListState createState() => _CategoryListState();
 }
 
 class _CategoryListState extends State<CategoryList> {
-  // by default first item will be selected
+  
   int selectedIndex = 0;
-  List categories = ['All', 'Sofa', 'Park bench', 'Armchair'];
+  List categories = ['All', 'Sofa', 'Cupboard', 'Armchair', 'Table'];
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -30,7 +29,7 @@ class _CategoryListState extends State<CategoryList> {
             alignment: Alignment.center,
             margin: EdgeInsets.only(
               left: kDefaultPadding,
-              // At end item it add extra 20 right  padding
+              
               right: index == categories.length - 1 ? kDefaultPadding : 0,
             ),
             padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),

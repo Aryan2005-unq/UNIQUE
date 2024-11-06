@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:furniture_app/components/search_box.dart';
+import 'package:furniture_app/components/generate_3d_button.dart'; // Import Generate3DButton
 import 'package:furniture_app/constants.dart';
 import 'package:furniture_app/models/product.dart';
 import 'package:furniture_app/screens/details/details_screen.dart';
@@ -14,13 +14,17 @@ class Body extends StatelessWidget {
       bottom: false,
       child: Column(
         children: <Widget>[
-          SearchBox(onChanged: (value) {}),
+          Generate3DButton(
+            onPressed: () {
+              // Define action for "Generate 3D" button here
+              print('Generate 3D button pressed');
+            },
+          ),
           CategoryList(),
           SizedBox(height: kDefaultPadding / 2),
           Expanded(
             child: Stack(
               children: <Widget>[
-                // Our background
                 Container(
                   margin: EdgeInsets.only(top: 70),
                   decoration: BoxDecoration(
@@ -32,7 +36,6 @@ class Body extends StatelessWidget {
                   ),
                 ),
                 ListView.builder(
-                  // here we use our demo procuts list
                   itemCount: products.length,
                   itemBuilder: (context, index) => ProductCard(
                     itemIndex: index,
