@@ -6,9 +6,9 @@ class CategoryList extends StatefulWidget {
   final Function(String) onCategorySelected;
 
   const CategoryList({
-    Key? key,
+    super.key,
     required this.onCategorySelected,
-  }) : super(key: key);
+  });
 
   @override
   _CategoryListState createState() => _CategoryListState();
@@ -17,33 +17,22 @@ class CategoryList extends StatefulWidget {
 class _CategoryListState extends State<CategoryList> {
   int selectedIndex = 0;
   final List<Map<String, dynamic>> categories = [
-    {
-      'name': 'All',
-      'icon': 'assets/icons/all.svg',
-    },
-    {
-      'name': 'Sofa',
-      'icon': 'assets/icons/sofa.svg',
-    },
-    {
-      'name': 'Cupboard',
-      'icon': 'assets/icons/cupboard.svg',
-    },
-    {
-      'name': 'Armchair',
-      'icon': 'assets/icons/armchair.svg',
-    },
+    {'name': 'All', 'icon': 'assets/icons/all.svg'},
+    {'name': 'Sofa', 'icon': 'assets/icons/sofa.svg'},
+    {'name': 'Cupboard', 'icon': 'assets/icons/cupboard.svg'},
+    {'name': 'Armchair', 'icon': 'assets/icons/armchair.svg'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 80,
-      margin: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+      margin: const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.blue, // Solid blue background
         borderRadius: BorderRadius.circular(12),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2), // Side spacing
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
@@ -53,11 +42,10 @@ class _CategoryListState extends State<CategoryList> {
             widget.onCategorySelected(categories[index]['name']);
           },
           child: Container(
-            margin: EdgeInsets.only(
-              left: kDefaultPadding,
-              right: index == categories.length - 1 ? kDefaultPadding : 0,
+            margin: const EdgeInsets.symmetric(  // Equal spacing between items
+              horizontal: kDefaultPadding / 2,
             ),
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: kDefaultPadding / 2,
               vertical: kDefaultPadding / 4,
             ),
@@ -78,17 +66,17 @@ class _CategoryListState extends State<CategoryList> {
                   categories[index]['icon'],
                   height: 32,
                   width: 32,
-                  color: index == selectedIndex 
-                      ? kSecondaryColor 
-                      : Colors.white,
+                  color: index == selectedIndex
+                      ? kSecondaryColor // Selected state color
+                      : Colors.black, // Default black icons
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   categories[index]['name'],
                   style: TextStyle(
-                    color: index == selectedIndex 
-                        ? kSecondaryColor 
-                        : Colors.white,
+                    color: index == selectedIndex
+                        ? kSecondaryColor // Selected text color
+                        : Colors.black, // Default black text
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),

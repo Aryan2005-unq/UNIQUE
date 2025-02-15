@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ViewIn3DScreen extends StatelessWidget {
+  const ViewIn3DScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("3D Viewer"),
+        title: const Text("3D Viewer"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("3D Model Display Here"),
       ),
     );

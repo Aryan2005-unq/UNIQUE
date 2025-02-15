@@ -10,7 +10,7 @@ import 'product_image.dart';
 class Body extends StatelessWidget {
   final Product product;
 
-  const Body({Key? key, required this.product}) : super(key: key);
+  const Body({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +23,8 @@ class Body extends StatelessWidget {
           children: <Widget>[
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+              decoration: const BoxDecoration(
                 color: kBackgroundColor,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(50),
@@ -55,7 +55,7 @@ class Body extends StatelessWidget {
                   ),
                   Text(
                     'Rs.${product.price}/-',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: kSecondaryColor,
@@ -63,15 +63,15 @@ class Body extends StatelessWidget {
                   ),
                   Padding(
                     padding:
-                        EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+                        const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
                     child: Text(
                       product.description,
-                      style: TextStyle(color: kTextLightColor),
+                      style: const TextStyle(color: kTextLightColor),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 5,
                     ),
                   ),
-                  SizedBox(height: kDefaultPadding),
+                  const SizedBox(height: kDefaultPadding),
                 ],
               ),
             ),

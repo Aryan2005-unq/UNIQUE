@@ -9,6 +9,8 @@ import 'category_list.dart';
 import 'product_card.dart';
 
 class Body extends StatefulWidget {
+  const Body({super.key});
+
   @override
   _BodyState createState() => _BodyState();
 }
@@ -33,7 +35,7 @@ class _BodyState extends State<Body> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MeshyScreen(),
+                  builder: (context) => const MeshyScreen(),
                 ),
               );
             },
@@ -43,13 +45,13 @@ class _BodyState extends State<Body> {
               setState(() => _selectedCategory = category);
             },
           ),
-          SizedBox(height: kDefaultPadding / 2),
+          const SizedBox(height: kDefaultPadding / 2),
           Expanded(
             child: Stack(
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.only(top: 70),
-                  decoration: BoxDecoration(
+                  margin: const EdgeInsets.only(top: 70),
+                  decoration: const BoxDecoration(
                     color: kBackgroundColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40),

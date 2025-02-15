@@ -4,10 +4,10 @@ import '../../../constants.dart';
 
 class ProductPoster extends StatelessWidget {
   const ProductPoster({
-    Key? key,  // Make key nullable
+    super.key,  // Make key nullable
     required this.size,  // Use required instead of @required
     this.image,
-  }) : super(key: key);
+  });
 
   final Size size;
   final String? image;  // Make image nullable
@@ -15,7 +15,7 @@ class ProductPoster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: kDefaultPadding),
+      margin: const EdgeInsets.symmetric(vertical: kDefaultPadding),
       // the height of this container is 80% of our width
       height: size.width * 0.8,
 
@@ -25,7 +25,7 @@ class ProductPoster extends StatelessWidget {
           Container(
             height: size.width * 0.7,
             width: size.width * 0.7,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
             ),

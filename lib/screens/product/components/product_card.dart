@@ -5,11 +5,11 @@ import '../../../constants.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
-    Key? key,
+    super.key,
     required this.itemIndex,
     required this.product,
     required this.press,
-  }) : super(key: key);
+  });
 
   final int itemIndex;
   final Product product;
@@ -20,7 +20,7 @@ class ProductCard extends StatelessWidget {
     // It will provide us total height and width of our screen
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(
+      margin: const EdgeInsets.symmetric(
         horizontal: kDefaultPadding,
         vertical: kDefaultPadding / 2,
       ),
@@ -36,10 +36,10 @@ class ProductCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(22),
                 color: itemIndex.isEven ? kBlueColor : kSecondaryColor,
-                boxShadow: [kDefaultShadow],
+                boxShadow: const [kDefaultShadow],
               ),
               child: Container(
-                margin: EdgeInsets.only(right: 10),
+                margin: const EdgeInsets.only(right: 10),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(22),
@@ -53,7 +53,7 @@ class ProductCard extends StatelessWidget {
               child: Hero(
                 tag: '${product.id}',
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                   height: 160,
                   // Image is square but we add extra 20 + 20 padding that's why width is 200
                   width: 200,
@@ -75,7 +75,7 @@ class ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Spacer(),
+                    const Spacer(),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: kDefaultPadding),
@@ -85,13 +85,13 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     // It uses the available space
-                    Spacer(),
+                    const Spacer(),
                     Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: kDefaultPadding * 1.5, // 30 padding
                         vertical: kDefaultPadding / 4, // 5 top and bottom
                       ),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: kSecondaryColor,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(22),
