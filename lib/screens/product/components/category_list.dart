@@ -14,14 +14,32 @@ class CategoryList extends StatefulWidget {
   _CategoryListState createState() => _CategoryListState();
 }
 
-class _CategoryListState extends State<CategoryList> {
+class _CategoryListState extends State<CategoryList> with SingleTickerProviderStateMixin {
   int selectedIndex = 0;
+  late AnimationController _animationController;
+  
   final List<Map<String, dynamic>> categories = [
     {'name': 'All', 'icon': 'assets/icons/all.svg'},
     {'name': 'Sofa', 'icon': 'assets/icons/sofa.svg'},
+    {'name': 'Table', 'icon': 'assets/icons/table.svg'},
     {'name': 'Cupboard', 'icon': 'assets/icons/cupboard.svg'},
     {'name': 'Armchair', 'icon': 'assets/icons/armchair.svg'},
   ];
+  
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,31 +47,49 @@ class _CategoryListState extends State<CategoryList> {
       height: 80,
       margin: const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
       decoration: BoxDecoration(
-        color: Colors.blue, // Solid blue background
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [kPrimaryColor, kPrimaryColor.withOpacity(0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: kPrimaryColor.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2), // Side spacing
+      padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding / 2),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         itemBuilder: (context, index) => GestureDetector(
           onTap: () {
+            _animationController.forward(from: 0.0);
             setState(() => selectedIndex = index);
             widget.onCategorySelected(categories[index]['name']);
           },
-          child: Container(
-            margin: const EdgeInsets.symmetric(  // Equal spacing between items
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            margin: const EdgeInsets.symmetric(
               horizontal: kDefaultPadding / 2,
+              vertical: kDefaultPadding / 4,
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: kDefaultPadding / 2,
               vertical: kDefaultPadding / 4,
             ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              color: index == selectedIndex 
+                  ? Colors.white.withOpacity(0.2)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: index == selectedIndex
-                    ? kSecondaryColor
+                    ? Colors.white
                     : Colors.transparent,
                 width: 2,
               ),
@@ -64,21 +100,19 @@ class _CategoryListState extends State<CategoryList> {
               children: [
                 SvgPicture.asset(
                   categories[index]['icon'],
-                  height: 32,
-                  width: 32,
-                  color: index == selectedIndex
-                      ? kSecondaryColor // Selected state color
-                      : Colors.black, // Default black icons
+                  height: 28,
+                  width: 28,
+                  color: Colors.white,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   categories[index]['name'],
                   style: TextStyle(
-                    color: index == selectedIndex
-                        ? kSecondaryColor // Selected text color
-                        : Colors.black, // Default black text
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: index == selectedIndex 
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

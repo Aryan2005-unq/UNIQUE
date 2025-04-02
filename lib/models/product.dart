@@ -83,4 +83,48 @@ List<Product> products = [
     model: 'assets/models/Cozy_Living_Room_1030102917.glb',
     category: "Sofa",
   ),
+  Product(
+    id: 15,
+    price: 18500,
+    title:
+        "Swivel Recliner Chair, Rocking Chair Nursery, Glider Rocker Recliner, Nursery Chair with Extra Large Footrest for Living Room, High Back, Upholstered Deep Seat (Deep Gray)",
+    image: "assets/images/chair4.jpg",
+    description:
+        "【360°Swivel Recliner Chair】The swivel rocking chair nursery allow you to swivel 360°. The backrest can be tilted from 95 degrees to 160 degrees, Footrest adjustment angle is 0-90°, to meet the needs of different scenes and you can fully relax in this magic nursery glider chair.【Comfortable Upholstery】The upholstery of the glide rocking chair is a selected linen fabric, which is breathable and skin-friendly.The backrest and seat have better resilience and are not easily deformed after long-term use.",
+    model: 'assets/models/chair4.glb',
+    category: "Armchair",
+  ),
+  Product(
+    id: 16,
+    price: 9999,
+    title:
+        "High Back Wing Chair Cushioned Lounge Single Seater Chair for Office Bedroom Solid Wood Upholstered Arm Chair Wingback Chair Sofa Bench Sofa Couch ",
+    image: "assets/images/chair5.jpg",
+    description:
+        "Product Dimensions:-63.5D x 73.7W x 116.8H Centimeters Wooden sofas have a classic look that complements a variety of interior design concepts. They Add A Touch Of Warmth, Elegance, And Natural Beauty To Any Living Space, Which Is Why They Are A Popular Choice For Many Homeowners. The Durability Test, Providing You With Decades Of Reliable Use And Pleasure. The sofa's structural integrity is ensured by the fact that hardwood frames are often more durable than those made of other materials.",
+    model: 'assets/models/Cozy_Living_Room_1030102917.glb',
+    category: "Armchair",
+  ),
+  Product(
+    id: 17,
+    price: 17000,
+    title:
+        "Royaloak Rily Fabric 3 Seater Sofa | Dual Color Sofa 3 Seater with Square Armrest & Super Soft Cushions",
+    image: "assets/images/sofa4.jpg",
+    description:
+        "Fabric Upholstery- Covered in soft, resilient fabric, the upholstery of this 3 seater sofa for living room provides a cozy, inviting texture that boosts comfort and endures daily wear. Its smooth finish perfectly complements the design of this sofa for home, making this simple sofa a versatile piece that enhances any room décor. 3-Seater Sofa- This dark grey sofa offers an extra large seating space making it ideal to accomodate two people comfortably. This size of the 3-person sofa strikes an ideal balance between spaciousness and versatility, making it a perfect choice for both compact living rooms and larger spaces.",
+    model: 'assets/models/Cozy_Living_Room_1030102917.glb',
+    category: "Sofa",
+  ),
+  Product(
+    id: 18,
+    price: 26499,
+    title:
+        "Torque - Louis Luxurious Sofa 3 Seater Leatherette (Brown) | Leather Sofa Set 3 Seater for Living Room Office ",
+    image: "assets/images/sofa5.jpg",
+    description:
+        "Material: Fabric and Wood Product Dimensions ( L*D*H ) Inches: 80*34*28 Inches | Perfect Festival Gift for the Home: Give the gift of comfort and style this holiday season with a luxurious sofa set. Ideal for creating cozy family gatherings, it’s the perfect present to enhance any living room and bring warmth to your loved one's home. Whether for family, friends, or new homeowners, this sofa set will make this Makar Sankranti, Republic Day Decor !",
+    model: 'assets/models/Cozy_Living_Room_1030102917.glb',
+    category: "Sofa",
+  ),
 ];

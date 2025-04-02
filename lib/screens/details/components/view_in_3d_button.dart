@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
+import 'package:furnitapp/screens/model_viewer_screen.dart';
 
 class ViewIn3DButton extends StatelessWidget {
+  final String modelUrl;
+
   const ViewIn3DButton({
     super.key,
-    required this.onPressed,
+    required this.modelUrl,
   });
-
-  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +24,18 @@ class ViewIn3DButton extends StatelessWidget {
       ),
       child: Center(
         child: ElevatedButton(
-          onPressed: onPressed,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ModelViewerScreen(
+                  modelUrl: modelUrl,
+                ),
+              ),
+            );
+          },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent, // Keeps the button background transparent
+            backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
           ),
           child: const Text(

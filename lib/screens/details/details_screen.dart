@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:furniture_app/constants.dart';
-import 'package:furniture_app/models/product.dart';
-import 'package:furniture_app/screens/ar_model_viewer_screen.dart';
+import 'package:furnitapp/constants.dart';
+import 'package:furnitapp/models/product.dart';
+import 'package:furnitapp/screens/ar_model_viewer_screen.dart';
 import 'components/body.dart';
 
 class DetailsScreen extends StatelessWidget {

@@ -16,18 +16,38 @@ class MeshyService {
     ));
   }
 
-  Future<String> createTask(File imageFile) async {
+  Future<String> createTask(
+    File imageFile, {
+    bool? isPBREnabled = true,
+    String? texturePrompt,
+    String? aiModel,
+    String topology = 'quad',
+    int targetPolycount = 30000,
+  }) async {
     try {
       List<int> imageBytes = await imageFile.readAsBytes();
       String base64Image = base64Encode(imageBytes);
       String dataUri = 'data:image/jpeg;base64,$base64Image';
 
-      final response = await _dio.post('/image-to-3d', data: {
+      final Map<String, dynamic> requestData = {
         'image_url': dataUri,
-        'enable_pbr': true,
+        'enable_pbr': isPBREnabled,
         'should_remesh': true,
         'should_texture': true,
-      });
+        'topology': topology,
+        'target_polycount': targetPolycount,
+      };
+
+      // Add optional parameters if provided
+      if (texturePrompt != null && texturePrompt.isNotEmpty) {
+        requestData['texture_prompt'] = texturePrompt;
+      }
+
+      if (aiModel != null && aiModel.isNotEmpty) {
+        requestData['ai_model'] = aiModel;
+      }
+
+      final response = await _dio.post('/image-to-3d', data: requestData);
 
       return response.data['result'];
     } catch (e) {
@@ -48,7 +68,8 @@ class MeshyService {
     if (error is DioException) {
       final response = error.response;
       if (response != null) {
-        return Exception('API Error: ${response.statusCode} - ${response.data}');
+        return Exception(
+            'API Error: ${response.statusCode} - ${response.data}');
       }
       return Exception('Network Error: ${error.message}');
     }

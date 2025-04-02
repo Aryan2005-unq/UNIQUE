@@ -19,6 +19,8 @@ class _MeshyScreenState extends State<MeshyScreen> {
   String? _taskId;
   Timer? _pollTimer;
   Map<String, dynamic>? _result;
+  bool _isCartoonMode = false;
+  bool _structuralAccuracyMode = false;
 
   @override
   void dispose() {
@@ -29,10 +31,10 @@ class _MeshyScreenState extends State<MeshyScreen> {
   Future<void> _processImage() async {
     try {
       setState(() => _isLoading = true);
-      
+
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      
+
       if (image == null) {
         setState(() {
           _status = 'No image selected';
@@ -42,9 +44,37 @@ class _MeshyScreenState extends State<MeshyScreen> {
       }
 
       setState(() => _status = 'Creating 3D model...');
-      _taskId = await _meshyService.createTask(File(image.path));
-      _startPolling();
 
+      // Use the enhanced MeshyService with parameters based on image type
+      if (_isCartoonMode) {
+        _taskId = await _meshyService.createTask(File(image.path),
+            texturePrompt:
+                "Vibrant cartoon character with accurate colors and smooth texture",
+            topology: "quad",
+            targetPolycount: 30000,
+            isPBREnabled: true);
+      } else if (_structuralAccuracyMode) {
+        // For furniture with better structural accuracy (preview mode)
+        _taskId = await _meshyService.createTask(
+          File(image.path),
+          topology: "triangle", // Triangle mesh for better structural details
+          targetPolycount: 80000, // Higher poly count for more detail
+          isPBREnabled: true,
+          texturePrompt:
+              "Accurate furniture model with precise structure and proportions",
+          // Not using meshy-4 (hard surface mode) to get the default preview behavior
+        );
+      } else {
+        // Original furniture mode (hard surface)
+        _taskId = await _meshyService.createTask(File(image.path),
+            topology: "quad",
+            targetPolycount: 30000,
+            isPBREnabled: true,
+            aiModel: "meshy-4" // Explicitly set to hard surface mode
+            );
+      }
+
+      _startPolling();
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -120,6 +150,36 @@ class _MeshyScreenState extends State<MeshyScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Mode selection switches
+            SwitchListTile(
+              title: const Text('Cartoon/Character Mode'),
+              subtitle: const Text(
+                  'Enable for better results with cartoon characters'),
+              value: _isCartoonMode,
+              onChanged: (bool value) {
+                setState(() {
+                  _isCartoonMode = value;
+                  // Disable structural accuracy mode if cartoon mode is enabled
+                  if (value) {
+                    _structuralAccuracyMode = false;
+                  }
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Structural Accuracy Mode'),
+              subtitle: const Text(
+                  'Enable for furniture models with better structural accuracy'),
+              value: _structuralAccuracyMode,
+              onChanged: _isCartoonMode
+                  ? null // Disable when cartoon mode is on
+                  : (bool value) {
+                      setState(() {
+                        _structuralAccuracyMode = value;
+                      });
+                    },
+            ),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _isLoading ? null : _processImage,
               child: const Text('Select Image'),

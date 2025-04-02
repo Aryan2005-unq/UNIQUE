@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:furniture_app/constants.dart';
-import 'package:furniture_app/models/product.dart';
-import 'package:furniture_app/screens/view_in_3d_screen.dart';
-
-
-import 'view_in_3d_button.dart'; 
+import 'package:furnitapp/constants.dart';
+import 'package:furnitapp/models/product.dart';
+import 'view_in_3d_button.dart';
 import 'product_image.dart';
 
 class Body extends StatelessWidget {
@@ -24,12 +21,19 @@ class Body extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-              decoration: const BoxDecoration(
-                color: kBackgroundColor,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(50),
                   bottomRight: Radius.circular(50),
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    offset: const Offset(0, 4),
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,9 +41,17 @@ class Body extends StatelessWidget {
                   Center(
                     child: Hero(
                       tag: '${product.id}',
-                      child: ProductPoster(
-                        size: size,
-                        image: product.image,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Loading indicator
+                          const CircularProgressIndicator(),
+                          // Product image
+                          ProductPoster(
+                            size: size,
+                            image: product.image,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -53,20 +65,39 @@ class Body extends StatelessWidget {
                       maxLines: 2,
                     ),
                   ),
-                  Text(
-                    'Rs.${product.price}/-',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: kSecondaryColor,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Rs.${product.price}/-',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: kSecondaryColor,
+                        ),
+                      ),
+                      const Spacer(),
+                      // Rating indicator
+                      Row(
+                        children: List.generate(
+                          5,
+                          (index) => Icon(
+                            index < 4 ? Icons.star : Icons.star_border,
+                            color: kSecondaryColor,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: kDefaultPadding / 2),
                     child: Text(
                       product.description,
-                      style: const TextStyle(color: kTextLightColor),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        height: 1.5,
+                      ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 5,
                     ),
@@ -76,14 +107,7 @@ class Body extends StatelessWidget {
               ),
             ),
             ViewIn3DButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewIn3DScreen(), 
-                  ),
-                );
-              },
+              modelUrl: product.model,
             ),
           ],
         ),
@@ -91,4 +115,3 @@ class Body extends StatelessWidget {
     );
   }
 }
-

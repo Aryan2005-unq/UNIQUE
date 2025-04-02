@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:furniture_app/components/generate_3d_button.dart';
-import 'package:furniture_app/constants.dart';
-import 'package:furniture_app/models/product.dart';
-import 'package:furniture_app/screens/details/details_screen.dart';
-import 'package:furniture_app/screens/meshy_screen.dart';
+import 'package:furnitapp/components/generate_3d_button.dart';
+import 'package:furnitapp/constants.dart';
+import 'package:furnitapp/models/product.dart';
+import 'package:furnitapp/screens/details/details_screen.dart';
+import 'package:furnitapp/screens/meshy_screen.dart';
 
 import 'category_list.dart';
 import 'product_card.dart';
