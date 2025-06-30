@@ -1,0 +1,272 @@
+# Manual Code Changes Required
+
+## 🚨 Critical Issues to Fix
+
+### 1. **Flask API Missing Endpoint** (app.py)
+
+**Problem**: Your mobile app calls `/predict-activities` but this endpoint doesn't exist in your Flask API.
+
+**Solution**: Add this endpoint to your `app.py` file:
+
+```python
+@app.route('/api/predict-activities', methods=['POST'])
+def predict_activities():
+    """
+    Predict activities from provided sensor data
+    """
+    try:
+        if hybrid_model is None or scaler is None or label_encoder is None:
+            return jsonify({'error': 'Models not loaded'}), 500
+            
+        # Get sensor data from request
+        data = request.get_json()
+        sensor_data = data.get('sensor_data', [])
+        
+        if not sensor_data:
+            return jsonify({'error': 'No sensor data provided'}), 400
+            
+        logger.info(f"🎯 Predicting activities for {len(sensor_data)} samples...")
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(sensor_data)
+        
+        # Remove timestamp and sample_id columns for prediction
+        prediction_columns = [col for col in df.columns if col not in ['timestamp', 'sample_id']]
+        sensor_features = df[prediction_columns]
+        
+        # Ensure column order matches training data
+        sensor_features = sensor_features[feature_columns]
+        
+        # Scale data
+        scaled_data = scaler.transform(sensor_features)
+        
+        # Reshape for model input
+        input_data = scaled_data.reshape((scaled_data.shape[0], 1, scaled_data.shape[1]))
+        
+        # Make predictions
+        predictions = hybrid_model.predict(input_data, verbose=0)
+        predicted_classes = np.argmax(predictions, axis=1)
+        confidence_scores = np.max(predictions, axis=1)
+        
+        # Convert back to activity names
+        predicted_activities = label_encoder.inverse_transform(predicted_classes)
+        
+        # Create results
+        results = []
+        for i in range(len(sensor_data)):
+            results.append({
+                'timestamp': sensor_data[i].get('timestamp'),
+                'predicted_activity': predicted_activities[i],
+                'confidence': float(confidence_scores[i]),
+                'sample_id': sensor_data[i].get('sample_id', i + 1)
+            })
+        
+        return jsonify({
+            'success': True,
+            'predictions': results,
+            'summary': {
+                'total_samples': len(results),
+                'average_confidence': float(np.mean(confidence_scores)),
+                'activities_detected': list(set(predicted_activities))
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error predicting activities: {str(e)}")
+        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
+```
+
+**Where to add**: Insert this code in your `app.py` file, right after the existing `/api/generate-data` endpoint.
+
+### 2. **Flask API Incomplete Code** (app.py)
+
+**Problem**: Your `/api/generate-data` endpoint is cut off mid-code.
+
+**Solution**: Complete the endpoint code:
+
+```python
+@app.route('/api/generate-data', methods=['POST'])
+def generate_synthetic_data():
+    """
+    Generate synthetic sensor data using trained GAN
+    This simulates data coming from a wearable device
+    """
+    try:
+        if ctgan_model is None:
+            return jsonify({'error': 'GAN model not loaded'}), 500
+            
+        # Get parameters from request
+        data = request.get_json()
+        num_samples = data.get('num_samples', 5)
+        simulate_device = data.get('simulate_device', True)
+        
+        logger.info(f"🔄 Generating {num_samples} synthetic sensor samples...")
+        
+        # Generate synthetic sensor data (NO Activity column)
+        synthetic_data = ctgan_model.sample(num_samples)
+        
+        # Convert to list of dictionaries for JSON response
+        sensor_data = []
+        
+        for i in range(len(synthetic_data)):
+            # Create timestamp (simulating real-time data)
+            timestamp = datetime.now() + timedelta(milliseconds=i*100)  # 10Hz
+            
+            # Create sample dictionary
+            sample = {
+                'timestamp': timestamp.isoformat(),
+                'sample_id': i + 1
+            }
+            
+            # Add sensor features
+            for col in feature_columns:
+                if col in synthetic_data.columns:
+                    value = synthetic_data.iloc[i][col]
+                    # Handle different sensor types
+                    if 'acc' in col.lower():
+                        sample[col.lower()] = float(value)
+                    elif 'gyro' in col.lower():
+                        sample[col.lower()] = float(value)
+                    else:
+                        sample[col] = float(value)
+            
+            sensor_data.append(sample)
+        
+        return jsonify({
+            'success': True,
+            'sensor_data': sensor_data,
+            'metadata': {
+                'num_samples': num_samples,
+                'timestamp_generated': datetime.now().isoformat(),
+                'sampling_rate': '10Hz',
+                'features': feature_columns
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error generating synthetic data: {str(e)}")
+        return jsonify({'error': f'Data generation failed: {str(e)}'}), 500
+
+
+# Add this at the bottom of app.py
+if __name__ == '__main__':
+    # Load models on startup
+    if load_models():
+        logger.info("🚀 All models loaded successfully! Starting server...")
+        app.run(host='0.0.0.0', port=5000, debug=True)
+    else:
+        logger.error("❌ Failed to load models. Please train models first using har_system.py")
+```
+
+### 3. **Mobile App API URL** (ActivityPredictionScreen.js)
+
+**Problem**: Placeholder URL won't work.
+
+**Solution**: Find your computer's IP address and update:
+
+**Step 1**: Find your IP address:
+- **Windows**: Open cmd, type `ipconfig`, look for "IPv4 Address"
+- **Mac**: Open terminal, type `ifconfig`, look for "inet" (not 127.0.0.1)
+- **Example**: `192.168.1.105`
+
+**Step 2**: Update the URL in `ActivityPredictionScreen.js`:
+
+```javascript
+// Change this line:
+const API_BASE_URL = 'http://your-backend-url.com/api';
+
+// To your actual IP (example):
+const API_BASE_URL = 'http://192.168.1.105:5000/api';
+```
+
+### 4. **Mobile App Dependencies** (React Native Project)
+
+**Problem**: Missing required packages.
+
+**Solution**: Install these packages in your React Native project:
+
+```bash
+npm install react-native-svg react-native-chart-kit
+```
+
+**For React Navigation** (if you want navigation):
+```bash
+npm install @react-navigation/native @react-navigation/stack
+npm install react-native-screens react-native-safe-area-context
+```
+
+### 5. **Dataset Column Names** (Potential Issue)
+
+**Problem**: Your mobile app expects specific column names like `acc_x`, `acc_y`, etc.
+
+**Solution**: Check your `HAR_test.csv` file and make sure column names match, or update the rendering code in `ActivityPredictionScreen.js`:
+
+```javascript
+// In renderSensorData function, update column references:
+<Text style={[styles.tableCell, styles.dataCol]}>
+  {row.acc_x?.toFixed(3) || row['Acc_X']?.toFixed(3) || 'N/A'}
+</Text>
+// Repeat for all sensor columns
+```
+
+### 6. **Error Handling Improvement** (Optional but Recommended)
+
+**Problem**: Better error messages needed.
+
+**Solution**: Add to `ActivityPredictionScreen.js`:
+
+```javascript
+const generateAndPredict = async () => {
+  try {
+    setLoading(true);
+    setIsGenerating(true);
+
+    // Add connection test first
+    const healthResponse = await fetch(`${API_BASE_URL}/health`, {
+      method: 'GET',
+      timeout: 5000
+    });
+    
+    if (!healthResponse.ok) {
+      throw new Error('Cannot connect to backend server. Make sure app.py is running.');
+    }
+
+    // Rest of your existing code...
+    
+  } catch (error) {
+    console.error('Error:', error);
+    
+    // More specific error messages
+    let errorMessage = 'Failed to generate data or predict activities.';
+    if (error.message.includes('Network request failed')) {
+      errorMessage = 'Cannot connect to server. Check if Flask API is running and IP address is correct.';
+    } else if (error.message.includes('timeout')) {
+      errorMessage = 'Server is taking too long to respond. Try again.';
+    }
+    
+    Alert.alert('Error', errorMessage, [{ text: 'OK' }]);
+  } finally {
+    setLoading(false);
+    setIsGenerating(false);
+  }
+};
+```
+
+## 📋 Summary of Manual Changes:
+
+1. ✅ **Add missing `/predict-activities` endpoint to `app.py`**
+2. ✅ **Complete the `/generate-data` endpoint in `app.py`**
+3. ✅ **Update API_BASE_URL in `ActivityPredictionScreen.js`**
+4. ✅ **Install required npm packages**
+5. ✅ **Check dataset column names match mobile app expectations**
+6. ✅ **Add better error handling (optional)**
+
+## 🔄 Order of Changes:
+
+1. **First**: Fix `app.py` (add missing endpoint)
+2. **Second**: Find your IP address
+3. **Third**: Update mobile app URL
+4. **Fourth**: Install mobile dependencies
+5. **Fifth**: Test the connection
+
+After these changes, your system should work end-to-end! 🎉
